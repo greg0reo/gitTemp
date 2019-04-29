@@ -23,9 +23,9 @@ class instruction{
 
 //instruction construction
 instruction::instruction(string addr, string load_store){
-	stringstream ss;
-	ss << std::hex << addr;
-	ss >> this->address;
+	istringstream ss(addr);
+	ss >> std::hex >> this->address;
+//	this->address = addr;
 	this->flag = load_store;
 }
 
@@ -76,7 +76,7 @@ int setAssociative(int associativity){
 	unsigned long long tag;
 	bool found;
 	int universalIndex;
-	int LRU = 0;
+	int lru = 0;
 	int LRUtime;
 	for(int i = 0; i < trace.size(); i++){
 		//dealing with individual instructions goes here
@@ -94,11 +94,11 @@ int setAssociative(int associativity){
 			}
 			if(LRUtime > cache[universalIndex].validBit){
 				LRUtime = cache[universalIndex].validBit;
-				LRU = j;
+				lru  = j;
 			}
 		}
 		if(!found){
-			universalIndex = LRU*waySize+index;
+			universalIndex = lru*waySize+index;
 			cache[universalIndex].tag = tag;
 			cache[universalIndex].validBit = total;
 		}
@@ -117,7 +117,7 @@ int fullAssociative(){
 	int index;
 	unsigned long long tag;
 	bool found;
-	int LRU = 0;
+	int lru = 0;
 	int LRUtime;
 	for(int i = 0; i < trace.size(); i++){
 		total++;
@@ -132,12 +132,12 @@ int fullAssociative(){
 			}
 			if(LRUtime > cache[j].validBit){
 				LRUtime = cache[j].validBit;
-				LRU = j;
+				lru = j;
 			}
 		}
 		if(!found){
-			cache[LRU].tag = tag;
-			cache[LRU].validBit = total;
+			cache[lru].tag = tag;
+			cache[lru].validBit = total;
 		}
 	}
 	return hits;
@@ -210,7 +210,7 @@ int setNoWrite(int associativity){
 	unsigned long long tag;
 	bool found;
 	int universalIndex;
-	int LRU = 0;
+	int lru = 0;
 	int LRUtime;
 	for(int i = 0; i < trace.size(); i++){
 		//dealing with individual instructions goes here
@@ -228,11 +228,11 @@ int setNoWrite(int associativity){
 			}
 			if(LRUtime > cache[universalIndex].validBit){
 				LRUtime = cache[universalIndex].validBit;
-				LRU = j;
+				lru = j;
 			}
 		}
 		if(!found || trace[i].flag == "L"){
-			universalIndex = LRU*waySize+index;
+			universalIndex = lru*waySize+index;
 			cache[universalIndex].tag = tag;
 			cache[universalIndex].validBit = total;
 		}
@@ -254,7 +254,7 @@ int prefetch(int associativity){ //Need to make it prefetch
 	unsigned long long tag;
 	bool found;
 	int universalIndex;
-	int LRU = 0;
+	int lru = 0;
 	int LRUtime;
 	for(int i = 0; i < trace.size(); i++){
 		//dealing with individual instructions goes here
@@ -274,11 +274,11 @@ int prefetch(int associativity){ //Need to make it prefetch
 			}
 			if(LRUtime > cache[universalIndex].validBit){
 				LRUtime = cache[universalIndex].validBit;
-				LRU = j;
+				lru = j;
 			}
 		}
 		if(!found){
-			universalIndex = LRU*waySize+index;
+			universalIndex = lru*waySize+index;
 			cache[universalIndex].tag = tag;
 			cache[universalIndex].validBit = lrucounter;
 		}
@@ -300,11 +300,11 @@ int prefetch(int associativity){ //Need to make it prefetch
 			}
 			if(LRUtime > cache[universalIndex].validBit){
 				LRUtime = cache[universalIndex].validBit;
-				LRU = j;
+				lru = j;
 			}
 		}
 		if(!found){
-			universalIndex = LRU*waySize+index;
+			universalIndex = lru*waySize+index;
 			cache[universalIndex].tag = tag;
 			cache[universalIndex].validBit = lrucounter;
 		}
@@ -331,7 +331,7 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 	unsigned long long tag;
 	bool found;
 	int universalIndex;
-	int LRU = 0;
+	int lru = 0;
 	int LRUtime;
 	for(int i = 0; i < trace.size(); i++){
 		//dealing with individual instructions goes here
@@ -351,11 +351,11 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 			}
 			if(LRUtime > cache[universalIndex].validBit){
 				LRUtime = cache[universalIndex].validBit;
-				LRU = j;
+				lru = j;
 			}
 		}
 		if(!found){
-			universalIndex = LRU*waySize+index;
+			universalIndex = lru*waySize+index;
 			cache[universalIndex].tag = tag;
 			cache[universalIndex].validBit = lrucounter;
 		}
@@ -364,7 +364,7 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 			//prefetching goes here: its just the top repeated with a different tag/index
 			tag = trace[i].address+32>>((unsigned long long)(log2(setSize))+5);
 			index = (trace[i].address+32>>5)%setSize;
-			LRUtime = INT_MAX;
+			LRUtime = lru;
 			lrucounter++;
 
 			found = false;
@@ -377,11 +377,11 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 				}
 				if(LRUtime > cache[universalIndex].validBit){
 					LRUtime = cache[universalIndex].validBit;
-					LRU = j;
+					lru = j;
 				}
 			}
 			if(!found){
-				universalIndex = LRU*waySize+index;
+				universalIndex = lru*waySize+index;
 				cache[universalIndex].tag = tag;
 				cache[universalIndex].validBit = lrucounter;
 			}
@@ -394,3 +394,57 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 
 }
 
+
+int main(int argc, char *argv[]){
+	string input = argv[1];
+	string output = argv[2];
+
+	ifstream ifile(input);
+	string line;
+	string addr;
+	string f;
+	int countem = 0;
+	
+	while(getline(ifile, line)){
+		countem++;
+
+		stringstream ss(line);
+//		printf("ples");
+		ss>>f>>addr;
+//		printf("1: %s\n2: %s\n\n", addr, f);
+		instruction greg(addr, f);
+		trace.push_back(greg);
+		printf("%lu", trace[countem].address);
+	}
+
+	int oneA = directMapped(1024);
+	int oneB = directMapped(4096);
+	int oneC = directMapped(16384);
+	int oneD = directMapped(32768);
+
+	int twoA = setAssociative(2);
+	int twoB = setAssociative(4);
+	int twoC = setAssociative(8);
+	int twoD = setAssociative(16);
+
+	int threeA = fullAssociative();
+	int threeB = hotCold();
+
+	int fourA = setNoWrite(2);
+	int fourB = setNoWrite(4);
+	int fourC = setNoWrite(8);
+	int fourD = setNoWrite(16);
+
+	int fiveA = prefetch(2);
+	int fiveB = prefetch(4);
+	int fiveC = prefetch(8);
+	int fiveD = prefetch(16);
+
+	int sixA = prefetchMiss(2);
+	int sixB = prefetchMiss(4);
+	int sixC = prefetchMiss(8);
+	int sixD = prefetchMiss(16);
+
+	printf("%d,%d, %d, %d, %d", oneA, oneB, oneC, oneD, countem);
+
+}
