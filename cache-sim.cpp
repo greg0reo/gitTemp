@@ -172,7 +172,7 @@ int hotCold(){ //need to make hot/cold LRU approximation
 						parent = (2* parent)+1;
 					}else{
 						cache[j].validBit = 0;
-						parent = 2*(parent+1)
+						parent = 2*(parent+1);
 					}
 
 				}
@@ -191,7 +191,7 @@ int hotCold(){ //need to make hot/cold LRU approximation
 				}
 			}
 			index = index + 1 - totalSets;
-			cache[index] = tag;
+			cache[index].tag = tag;
 		}
 	}
 
