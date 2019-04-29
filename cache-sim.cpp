@@ -4,7 +4,10 @@
 #include <queue>
 #include <sstream>
 #include <string>
-#include <math>
+#include <math.h>
+#include <cmath>
+#include <cstdlib>
+#include <bits/stdc++.h>
 #include <chrono>
 
 using namespace std;
@@ -44,7 +47,7 @@ int directMapped(int cacheSize){
 	int hits = 0;
 	int total = 0;
 	int setSize = cacheSize/32;
-	vector<unsigned long long> cache[setSize];
+	vector<unsigned long long> cache(setSize);
 	int index;
 	unsigned long long tag;
 	for(int i = 0; i< trace.size(); i++){
@@ -68,7 +71,7 @@ int setAssociative(int associativity){
 	int totalSets = 16384/32;
 	int setSize = totalSets/associativity;
 	int waySize = 16384/associativity;
-	vector<cacheSet> cache[totalSets];
+	vector<cacheSet> cache(totalSets);
 	int index;
 	unsigned long long tag;
 	bool found;
@@ -80,7 +83,7 @@ int setAssociative(int associativity){
 		total++;
 		LRUtime = INT_MAX;
 		index = (trace[i].address>>5)%setSize;
-		tag = trance[i].address>>((unsigned long long)(log2(setSize))+5);
+		tag = trace[i].address>>((unsigned long long)(log2(setSize))+5);
 		found = false;
 		for(int j = 0; j < associativity; j++){
 			universalIndex = j*waySize+index;
@@ -110,7 +113,7 @@ int fullAssociative(){
 	int hits = 0;
 	int total = 0;
 	int totalSets = 16384/32;
-	vector<cacheSet> cache[totalSets];
+	vector<cacheSet> cache(totalSets);
 	int index;
 	unsigned long long tag;
 	bool found;
@@ -144,7 +147,7 @@ int hotCold(){ //need to make hot/cold LRU approximation
 	int hits = 0;
 	int total = 0;
 	int totalSets = 16384/32;
-	vector<cacheSet> cache[totalSets];
+	vector<cacheSet> cache(totalSets);
 	for(int i = 0; i < cache.size(); i++){
 		cache[i].validBit = 0; //validBit takes the place of the hot cold bit
 	}
@@ -202,7 +205,7 @@ int setNoWrite(int associativity){
 	int totalSets = 16384/32;
 	int setSize = totalSets/associativity;
 	int waySize = 16384/associativity;
-	vector<cacheSet> cache[totalSets];
+	vector<cacheSet> cache(totalSets);
 	int index;
 	unsigned long long tag;
 	bool found;
@@ -246,7 +249,7 @@ int prefetch(int associativity){ //Need to make it prefetch
 	int totalSets = 16384/32;
 	int setSize = totalSets/associativity;
 	int waySize = 16384/associativity;
-	vector<cacheSet> cache[totalSets];
+	vector<cacheSet> cache(totalSets);
 	int index;
 	unsigned long long tag;
 	bool found;
@@ -259,7 +262,7 @@ int prefetch(int associativity){ //Need to make it prefetch
 		lrucounter++;
 		LRUtime = INT_MAX;
 		index = (trace[i].address>>5)%setSize;
-		tag = trance[i].address>>((unsigned long long)(log2(setSize))+5);
+		tag = trace[i].address>>((unsigned long long)(log2(setSize))+5);
 		//to prefetch, get a second tag, then run the bellow code again for that tag
 		found = false;
 		for(int j = 0; j < associativity; j++){
@@ -282,7 +285,7 @@ int prefetch(int associativity){ //Need to make it prefetch
 
 
 		//prefetching goes here: its just the top repeated with a different tag/index
-		tag = trance[i].address+32>>((unsigned long long)(log2(setSize))+5);
+		tag = trace[i].address+32>>((unsigned long long)(log2(setSize))+5);
 		index = (trace[i].address+32>>5)%setSize;
 		LRUtime = INT_MAX;
 		lrucounter++;
@@ -323,7 +326,7 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 	int totalSets = 16384/32;
 	int setSize = totalSets/associativity;
 	int waySize = 16384/associativity;
-	vector<cacheSet> cache[totalSets];
+	vector<cacheSet> cache(totalSets);
 	int index;
 	unsigned long long tag;
 	bool found;
@@ -336,7 +339,7 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 		lrucounter++;
 		LRUtime = INT_MAX;
 		index = (trace[i].address>>5)%setSize;
-		tag = trance[i].address>>((unsigned long long)(log2(setSize))+5);
+		tag = trace[i].address>>((unsigned long long)(log2(setSize))+5);
 		//to prefetch, get a second tag, then run the bellow code again for that tag
 		found = false;
 		for(int j = 0; j < associativity; j++){
@@ -359,7 +362,7 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 
 		if(!found){
 			//prefetching goes here: its just the top repeated with a different tag/index
-			tag = trance[i].address+32>>((unsigned long long)(log2(setSize))+5);
+			tag = trace[i].address+32>>((unsigned long long)(log2(setSize))+5);
 			index = (trace[i].address+32>>5)%setSize;
 			LRUtime = INT_MAX;
 			lrucounter++;
