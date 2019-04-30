@@ -433,41 +433,48 @@ int main(int argc, char *argv[]){
 	ifstream repeat(input);
 	while(repeat >> f >> std::hex >> addr){
 		
+		
 //		cout << counter2 << endl;
 		trace[counter2].address = addr;
 		trace[counter2].flag = f;
 		counter2++;
+		if(counter2 == countem-2){
+			cout << "break at dotted line" << endl;
+			break;
+			cout << "It didn't break, did it?" << endl;
+		}
 	}
 
-	printf("Do we get here?");
-
+//	printf("Do we get here?");
+	cout << "this blows" <<endl;
 	int oneA = directMapped(1024);
 	int oneB = directMapped(4096);
 	int oneC = directMapped(16384);
 	int oneD = directMapped(32768);
-
+	cout << "how low can we go?" << endl;
 	int twoA = setAssociative(2);
 	int twoB = setAssociative(4);
 	int twoC = setAssociative(8);
 	int twoD = setAssociative(16);
-
+	cout << "can we go down low?" << endl;
 	int threeA = fullAssociative();
 	int threeB = hotCold();
-
+	cout << "all the way to the flo" << endl;
 	int fourA = setNoWrite(2);
 	int fourB = setNoWrite(4);
 	int fourC = setNoWrite(8);
 	int fourD = setNoWrite(16);
-
+	cout << "can we make it to the top?" << endl;
 	int fiveA = prefetch(2);
 	int fiveB = prefetch(4);
 	int fiveC = prefetch(8);
 	int fiveD = prefetch(16);
-
+	cout << "like we're never gonna stop?" << endl;
 	int sixA = prefetchMiss(2);
 	int sixB = prefetchMiss(4);
 	int sixC = prefetchMiss(8);
 	int sixD = prefetchMiss(16);
+	cout << "booger blaster" << endl;
 
 	printf("%d,%d, %d, %d, %d", oneA, oneB, oneC, oneD, countem);
 
