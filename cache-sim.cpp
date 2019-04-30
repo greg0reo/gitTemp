@@ -18,16 +18,19 @@ class instruction{
 
 	unsigned long long address;
 	string flag;
-	instruction(string addr, string load_store);
+	instruction();
 };
 
+instruction::instruction(){
+}
+
 //instruction construction
-instruction::instruction(string addr, string load_store){
+/*instruction::instruction(string addr, string load_store){
 	istringstream ss(addr);
 	ss >> std::hex >> this->address;
 //	this->address = addr;
 	this->flag = load_store;
-}
+}*/
 
 //only use tag and valid bit, but that's all you need. This is a single cacheline
 class cacheSet{
@@ -401,21 +404,42 @@ int main(int argc, char *argv[]){
 
 	ifstream ifile(input);
 	string line;
-	string addr;
+	unsigned long long addr;
 	string f;
 	int countem = 0;
-	
-	while(getline(ifile, line)){
+	//it is entirely possible that the vector runs out of space
+	cout << trace.max_size() << endl;
+	while(ifile >> f >> std::hex >> addr){
 		countem++;
 
-		stringstream ss(line);
+//		stringstream ss(line);
 //		printf("ples");
-		ss>>f>>addr;
+//		ss>>f>>addr;
 //		printf("1: %s\n2: %s\n\n", addr, f);
-		instruction greg(addr, f);
-		trace.push_back(greg);
-		printf("%lu", trace[countem].address);
+//		instruction greg;
+//		greg.address = addr;
+//		if(f != NULL){
+//		greg.flag = f;
+//		}
+//		trace[countem].address = addr;
+//		trace[countem].flag = f;
+//		trace.push_back(greg);
+//		printf("%lu", trace[countem].address);
 	}
+
+	trace.resize(countem+1);
+	cout << "AHHHHHHH" << countem <<endl;
+	int counter2 = 0;
+	ifstream repeat(input);
+	while(repeat >> f >> std::hex >> addr){
+		
+//		cout << counter2 << endl;
+		trace[counter2].address = addr;
+		trace[counter2].flag = f;
+		counter2++;
+	}
+
+	printf("Do we get here?");
 
 	int oneA = directMapped(1024);
 	int oneB = directMapped(4096);
