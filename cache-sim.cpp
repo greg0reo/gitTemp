@@ -6,6 +6,7 @@
 #include <string>
 #include <math.h>
 #include <cmath>
+#include <stdlib.h>
 #include <cstdlib>
 #include <bits/stdc++.h>
 #include <chrono>
@@ -73,29 +74,50 @@ int setAssociative(int associativity){
 	int total = 0;
 	int totalSets = 16384/32;
 	int setSize = totalSets/associativity;
-	int waySize = 16384/associativity;
+	int waySize = totalSets/associativity;
 	vector<cacheSet> cache(totalSets);
+
 	int index;
 	unsigned long long tag;
 	bool found;
 	int universalIndex;
 	int lru = 0;
 	int LRUtime;
+//	cout << "right before parsing trace" << endl;
 	for(int i = 0; i < trace.size(); i++){
 		//dealing with individual instructions goes here
+//	std::this_thread::sleep_for (std::chrono::seconds(5));
+//		cout << "just starting loop" << endl;
+//		std::this_thread::sleep_for (std::chrono::seconds(2));
+
 		total++;
 		LRUtime = INT_MAX;
 		index = (trace[i].address>>5)%setSize;
 		tag = trace[i].address>>((unsigned long long)(log2(setSize))+5);
 		found = false;
+//		cout << "after initializing everything important" << endl;
+//		std::this_thread::sleep_for (std::chrono::seconds(2));
+
 		for(int j = 0; j < associativity; j++){
+//			cout << "starting second loop" << endl;
+//			std::this_thread::sleep_for (std::chrono::seconds(2));
+//			cout << "yah yeet" << endl;
+			// THIS IS IT!!!! I FOUND THE PIECE OF CODE THAT DOESN"T WORK!!!
 			universalIndex = j*waySize+index;
+//			cout << "ja yoot" << endl;
 			if(cache[universalIndex].tag == tag && !found){
+//				cout << "starting first if" <<endl;
+//				std::this_thread::sleep_for (std::chrono::seconds(2));
+
 				hits++;
-				cache[universalIndex].validBit == total; //sets validBit to instr# to keep track of LRU
+
+				cache[universalIndex].validBit = total; //sets validBit to instr# to keep track of LRU
 				found = true;
 			}
 			if(LRUtime > cache[universalIndex].validBit){
+//				cout << "seconf if" << endl;
+//				std::this_thread::sleep_for (std::chrono::seconds(2));
+
 				LRUtime = cache[universalIndex].validBit;
 				lru  = j;
 			}
@@ -136,7 +158,7 @@ int fullAssociative(){
 			
 			if(cache[j].tag == tag && !found){
 				hits++;
-				cache[j].validBit == total;
+				cache[j].validBit = total;
 				found = true;
 			}
 			if(LRUtime > cache[j].validBit){
@@ -213,7 +235,7 @@ int setNoWrite(int associativity){
 	int total = 0;
 	int totalSets = 16384/32;
 	int setSize = totalSets/associativity;
-	int waySize = 16384/associativity;
+	int waySize = totalSets/associativity;
 	vector<cacheSet> cache(totalSets);
 	int index;
 	unsigned long long tag;
@@ -232,7 +254,7 @@ int setNoWrite(int associativity){
 			universalIndex = j*waySize+index;
 			if(cache[universalIndex].tag == tag && !found){
 				hits++;
-				cache[universalIndex].validBit == total; //sets validBit to instr# to keep track of LRU
+				cache[universalIndex].validBit = total; //sets validBit to instr# to keep track of LRU
 				found = true;
 			}
 			if(LRUtime > cache[universalIndex].validBit){
@@ -240,8 +262,9 @@ int setNoWrite(int associativity){
 				lru = j;
 			}
 		}
-		if(!found || trace[i].flag == "L"){
+		if(!found && trace[i].flag == "L"){
 			universalIndex = lru*waySize+index;
+//			cout << "so is this thing ever accessed?" << endl;
 			cache[universalIndex].tag = tag;
 			cache[universalIndex].validBit = total;
 		}
@@ -257,7 +280,7 @@ int prefetch(int associativity){ //Need to make it prefetch
 	int lrucounter = 0;
 	int totalSets = 16384/32;
 	int setSize = totalSets/associativity;
-	int waySize = 16384/associativity;
+	int waySize = totalSets/associativity;
 	vector<cacheSet> cache(totalSets);
 	int index;
 	unsigned long long tag;
@@ -278,7 +301,7 @@ int prefetch(int associativity){ //Need to make it prefetch
 			universalIndex = j*waySize+index;
 			if(cache[universalIndex].tag == tag && !found){
 				hits++;
-				cache[universalIndex].validBit == lrucounter; //sets validBit to instr# to keep track of LRU
+				cache[universalIndex].validBit = lrucounter; //sets validBit to instr# to keep track of LRU
 				found = true;
 			}
 			if(LRUtime > cache[universalIndex].validBit){
@@ -304,7 +327,7 @@ int prefetch(int associativity){ //Need to make it prefetch
 			universalIndex = j*waySize+index;
 			if(cache[universalIndex].tag == tag && !found){
 				//hits++; WE do not count hits when prefetching
-				cache[universalIndex].validBit == lrucounter; //sets validBit to instr# to keep track of LRU
+				cache[universalIndex].validBit = lrucounter; //sets validBit to instr# to keep track of LRU
 				found = true;
 			}
 			if(LRUtime > cache[universalIndex].validBit){
@@ -334,7 +357,7 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 	int lrucounter = 0;
 	int totalSets = 16384/32;
 	int setSize = totalSets/associativity;
-	int waySize = 16384/associativity;
+	int waySize = totalSets/associativity;
 	vector<cacheSet> cache(totalSets);
 	int index;
 	unsigned long long tag;
@@ -355,7 +378,7 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 			universalIndex = j*waySize+index;
 			if(cache[universalIndex].tag == tag && !found){
 				hits++;
-				cache[universalIndex].validBit == lrucounter; //sets validBit to instr# to keep track of LRU
+				cache[universalIndex].validBit = lrucounter; //sets validBit to instr# to keep track of LRU
 				found = true;
 			}
 			if(LRUtime > cache[universalIndex].validBit){
@@ -373,7 +396,8 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 			//prefetching goes here: its just the top repeated with a different tag/index
 			tag = trace[i].address+32>>((unsigned long long)(log2(setSize))+5);
 			index = (trace[i].address+32>>5)%setSize;
-			LRUtime = lru;
+			LRUtime = INT_MAX;
+			lru = 0;
 			lrucounter++;
 
 			found = false;
@@ -381,7 +405,7 @@ int prefetchMiss(int associativity){ //Need to make it prefetch
 				universalIndex = j*waySize+index;
 				if(cache[universalIndex].tag == tag && !found){
 					//hits++; WE do not count hits when prefetching
-					cache[universalIndex].validBit == lrucounter; //sets validBit to instr# to keep track of LRU
+					cache[universalIndex].validBit = lrucounter; //sets validBit to instr# to keep track of LRU
 					found = true;
 				}
 				if(LRUtime > cache[universalIndex].validBit){
@@ -434,7 +458,7 @@ int main(int argc, char *argv[]){
 	}
 
 	trace.resize(countem+1);
-	cout << "AHHHHHHH" << countem <<endl;
+//	cout << "AHHHHHHH" << countem <<endl;
 	int counter2 = 0;
 	ifstream repeat(input);
 	while(repeat >> f >> std::hex >> addr){
@@ -444,47 +468,73 @@ int main(int argc, char *argv[]){
 		trace[counter2].address = addr;
 		trace[counter2].flag = f;
 		counter2++;
-		if(counter2 == countem-2){
+/*		if(counter2 == countem-2){
 			cout << "break at dotted line" << endl;
 			break;
 			cout << "It didn't break, did it?" << endl;
-		}
+		}*/
 	}
-
+	using namespace std::chrono;
+//	std::this_thread::sleep_for (std::chrono::seconds(5));
 //	printf("Do we get here?");
-	cout << "this blows" <<endl;
+//	cout << "this blows" <<endl;
 	int oneA = directMapped(1024);
 	int oneB = directMapped(4096);
 	int oneC = directMapped(16384);
 	int oneD = directMapped(32768);
-	cout << "how low can we go?" << endl;
+//	sleep(5000);
+//	std::this_thread::sleep_for (std::chrono::seconds(5));
+//	cout << "how low can we go?" << endl;
 	int twoA = setAssociative(2);
 	int twoB = setAssociative(4);
 	int twoC = setAssociative(8);
 	int twoD = setAssociative(16);
-	cout << "can we go down low?" << endl;
 
-	cout << "how is this even possible? will this break it?" << endl;
-//	int threeA = fullAssociative();
-	cout << "we can make it about this low" << endl;
+//	sleep(5000);
+//	std::this_thread::sleep_for (std::chrono::seconds(5));
+//	cout << "can we go down low?" << endl;
+
+//	cout << "how is this even possible? will this break it?" << endl;
+	int threeA = fullAssociative();
+//	cout << "we can make it about this low" << endl;
 	int threeB = hotCold();
-	cout << "all the way to the flo" << endl;
+//	cout << "all the way to the flo" << endl;
 	int fourA = setNoWrite(2);
 	int fourB = setNoWrite(4);
 	int fourC = setNoWrite(8);
 	int fourD = setNoWrite(16);
-	cout << "can we make it to the top?" << endl;
+//	cout << "can we make it to the top?" << endl;
 	int fiveA = prefetch(2);
 	int fiveB = prefetch(4);
 	int fiveC = prefetch(8);
 	int fiveD = prefetch(16);
-	cout << "like we're never gonna stop?" << endl;
+//	cout << "like we're never gonna stop?" << endl;
 	int sixA = prefetchMiss(2);
 	int sixB = prefetchMiss(4);
 	int sixC = prefetchMiss(8);
 	int sixD = prefetchMiss(16);
-	cout << "booger blaster" << endl;
+	string suffix = ",";
+	stringstream almostdone;
+	almostdone << countem;
+	string baddabing = almostdone.str();
+	suffix.append(baddabing);
+	suffix.append("; ");
+//	cout << "booger blaster" << endl;
 
-	printf("%d,%d, %d, %d, %d", oneA, oneB, oneC, oneD, countem);
+	ofstream done;
+	done.open(output);
 
+	done << oneA << suffix << oneB << suffix << oneC << suffix << oneD << suffix << endl;
+	done << twoA << suffix << twoB << suffix << twoC << suffix << twoD << suffix << endl;
+	done << threeA << suffix << endl;
+	done << threeB << suffix << endl;
+	done << fourA << suffix << fourB << suffix << fourC << suffix << fourD << suffix << endl;
+	done << fiveA << suffix << fiveB << suffix << fiveC << suffix << fiveD << suffix << endl;
+	done << sixA << suffix << sixB << suffix << sixC << suffix << sixD << suffix << endl;
+
+
+	
+
+//	printf("%d,%d, %d, %d, %d\n", oneA, oneB, oneC, oneD, countem);
+//	printf("%d, %d, %d, %d, %d\n", 
 }
