@@ -117,6 +117,11 @@ int fullAssociative(){
 	int total = 0;
 	int totalSets = 16384/32;
 	vector<cacheSet> cache(totalSets);
+	for(int i = 0; i < totalSets; i++){
+		cache[i].validBit = 0;
+		cache[i].tag = 0;
+		
+	}
 	int index;
 	unsigned long long tag;
 	bool found;
@@ -128,6 +133,7 @@ int fullAssociative(){
 		found = false;
 		tag = trace[i].address>>5;
 		for(int j = 0; j < totalSets; j++){
+			
 			if(cache[j].tag == tag && !found){
 				hits++;
 				cache[j].validBit == total;
@@ -457,7 +463,10 @@ int main(int argc, char *argv[]){
 	int twoC = setAssociative(8);
 	int twoD = setAssociative(16);
 	cout << "can we go down low?" << endl;
-	int threeA = fullAssociative();
+
+	cout << "how is this even possible? will this break it?" << endl;
+//	int threeA = fullAssociative();
+	cout << "we can make it about this low" << endl;
 	int threeB = hotCold();
 	cout << "all the way to the flo" << endl;
 	int fourA = setNoWrite(2);
