@@ -233,28 +233,31 @@ int hotCold(){ //need to make hot/cold LRU approximation
 int hotCold(){
 	int hits = 0;
 	int total = 0;
-	totalSets = 16384/32;
+	int totalSets = 16384/32;
 	vector<cacheSet> cache(totalSets);
 	vector<int> bits(totalSets-1);
+	for(int i=0; i < totalSets-1; i++){
+		bits[i] = 0;
+	}
 	unsigned long long tag;
 	int index;
 	bool found;
 	int midpoint;
 	int power;
-//	int old;
+	int old;
 	for(int i = 0; i < trace.size(); i++){
 		total++;
 		found = false;
 		tag = trace[i].address>>5;
-		midpoint = (totalSets/2)-1;
+		midpoint = (totalSets-2)/2;
 		power = totalSets/2;
 		for(int j = 0; j < cache.size(); j++){
 //			midpoint = totalSets/2 -1;
 			if(tag == cache[j].tag && !found){
 				hits++;
 				found = true;
-				while(power != 1;){
-					if(bits[midpoint] == 1){
+				while(power != 1){
+					if(j > midpoint){
 						bits[midpoint] = 0;
 					}else{
 						bits[midpoint] = 1;
@@ -267,37 +270,43 @@ int hotCold(){
 						midpoint = midpoint + power;
 					}
 				}				
-				if(bits[midpoint] == 1){
+				if(j > midpoint){
 					bits[midpoint] = 0;
 				}else{
 					bits[midpoint] = 1;
 				}
 
 			}
-
+		}
 			//REPLACEMENT
-			if(!found){
-				while(power != 1;){
-					if(bits[midpoint] == 1){
-						bits[midpoint] = 0;
-						power = power/2;
-						midpoint = midpoint + power;
-					}else{
-						bits[midpoint] = 1;
-						power = power/2;
-						midpoint = midpoint - power;
-					}
-				}
+		if(!found){
+			while(power != 1){
+				old = midpoint;
 				if(bits[midpoint] == 1){
-					cache[midpoint+1].tag = tag;
-					bits[midpoint] = 0;
+//					bits[midpoint] = 0;
+					power = power/2;
+					midpoint = midpoint + power;
 				}else{
-					cache[midpoint].tag = tag;
-					bits[midpoint] = 1;
+//					bits[midpoint] = 1;
+					power = power/2;
+					midpoint = midpoint - power;
 				}
+				if(old < midpoint){
+					bits[old] = 0;
+				}else{
+					bits[old] = 1;
+				}
+			}
+			if(bits[midpoint] == 1){
+				cache[midpoint+1].tag = tag;
+				bits[midpoint] = 0;
+			}else{
+				cache[midpoint].tag = tag;
+				bits[midpoint] = 1;
 			}
 		}
 	}
+
 
 	return hits;
 }
@@ -511,7 +520,7 @@ int main(int argc, char *argv[]){
 	string f;
 	int countem = 0;
 	//it is entirely possible that the vector runs out of space
-	cout << trace.max_size() << endl;
+//	cout << trace.max_size() << endl;
 	while(ifile >> f >> std::hex >> addr){
 		countem++;
 
