@@ -182,6 +182,7 @@ int hotCold(){ //need to make hot/cold LRU approximation
 	for(int i = 0; i < cache.size(); i++){
 		cache[i].validBit = 0; //validBit takes the place of the hot cold bit
 	}
+
 	unsigned long long tag;
 	int index;
 	bool found;
