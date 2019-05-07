@@ -2,5 +2,5 @@ Grigoriy Redozubov
 gredozu1
 00657002
 
-I could not get the hot/cold bit cache to work.
+The hold cold function get some traces off by 1.
 Everything else works!
